@@ -1,22 +1,21 @@
-# flask_tech_stack
-
 # Technologies Used
 Python
 Flask
 SQLAlchemy
 SQLite (Database)
 
-# Install Virtualenv using command line
+# Installation and Setup
+*Install Virtualenv using command line
 python3 -m venv venv
 
-# Activate Virtualenv using command line
+*Activate Virtualenv using command line
 source venv/bin/activate
 
-# Install all necessaary requirements
+*Install all necessaary requirements
 pip3 install -r requirements.txt
 
 
-# Run the project by this command -
+*Run the project by this command -
 python3 run.py 
 
 OR
