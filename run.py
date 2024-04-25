@@ -1,10 +1,25 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
+import json
 
 # It will configure and initialize the database connection
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///products.db'
 db = SQLAlchemy(app)
+
+#error_handler with the help of decorators
+@app.errorhandler(404)
+def not_found_error(error):
+    return jsonify({'error': 'Not Found', 'message': 'The requested resource was not found.'}), 404
+
+@app.errorhandler(400)
+def not_found_error(error):
+    return jsonify({'error': 'Bad Request', 'message': 'Bad Request'}), 400
+
+@app.errorhandler(500)
+def not_found_error(error):
+    return jsonify({'error': 'Internal Server Error', 'message': 'Internal Server Error'}), 500
+
 
 # Product Model - For creating a table in database
 class Product(db.Model):
@@ -17,9 +32,9 @@ class Product(db.Model):
         return f'<Product {self.id}>'
 
 # Routes 
-
 #1. To get all the products -
 @app.route('/products', methods=['GET'])
+@app.route('/', methods=['GET'])
 def get_products():
     # query for getting all the products
     products = Product.query.all()
@@ -34,6 +49,29 @@ def get_products():
         output.append(product_data)
     # jsonify is used to view output in json format
     return jsonify({'products': output})
+
+
+@app.route('/allproducts', methods=['GET'])
+def get_products_with_pagination():
+    #Get paginated list of products.
+
+    limit = int(request.args.get('limit', 5))
+    skip = int(request.args.get('skip', 0))
+
+    products = Product.query.offset(skip).limit(limit).all()
+
+    # Serialize products to JSON format
+    products_list = []
+    for product in products:
+        product_data = {
+            'id': product.id,
+            'name': product.name,
+            'description': product.description,
+            'ratings': product.ratings
+        }
+        products_list.append(product_data)
+
+    return jsonify(products_list)
 
 
 # Get products by particular id
@@ -82,6 +120,7 @@ def delete_product(id):
     db.session.delete(product)
     db.session.commit()
     return jsonify({'message': 'Product deleted successfully!'})
+
 
 if __name__ == '__main__':
     db.create_all()
