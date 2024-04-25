@@ -10,7 +10,7 @@ db = SQLAlchemy(app)
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.Text, nullable=False)
+    description = db.Column(db.Text, nullable=True)
     ratings = db.Column(db.Float, nullable=False)
 
     def __repr__(self):
@@ -54,14 +54,20 @@ def get_product(id):
 def create_product():
     data = request.get_json()
     new_product = Product(name=data['name'], description=data['description'], ratings=data['ratings'])
-    db.session.add(new_product)
-    db.session.commit()
+    db.session.add(new_product)   #This line adds a new record to the database session
+    db.session.commit()   # This line commits the changes made in the current session to the database. 
     return jsonify({'message': 'Product created successfully!'})
 
 # Update the product by id
 @app.route('/products/<int:id>', methods=['PUT'])
 def update_product(id):
     product = Product.query.get_or_404(id)
+    
+    '''It tries to fetch an object by its primary key. 
+    If the object with the specified ID exists in the database, 
+    it returns that object. However, if no object is found with the given ID, 
+    it automatically raises a 404 error''' 
+
     data = request.get_json()
     product.name = data['name']
     product.description = data['description']
